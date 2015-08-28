@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="NewTranslator.Adornment.TranslationAdornment"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
+             xmlns:adornment="clr-namespace:NewTranslator.Adornment"
+             xmlns:presentation="clr-namespace:NewTranslator.Presentation"
+             mc:Ignorable="d"
+             d:DesignHeight="200" d:DesignWidth="200"
+             TextOptions.TextFormattingMode="Display"
+             UseLayoutRounding="True"
+             Initialized="UserControl_Initialized"
+             Background="Transparent"
+             IsHitTestVisible="True"
+             x:Name="TranslationAdornmentControl">
+
+    <!--styles-->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <presentation:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter" />
+            <presentation:DataContextProxy x:Key="DataContextProxy" Data="{Binding}"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border BorderThickness="1" MaxWidth="600" Cursor="Arrow">
+        <Border.Effect>
+            <DropShadowEffect ShadowDepth="0" Color="DarkGray" Opacity="0.5" />
+        </Border.Effect>
+
+        <Grid Name="grdContent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <!--header-->
+            <Grid MinHeight="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <presentation:ModernProgressRing x:Name="ProgressRing" IsActive="True" Width="16" Height="16" Margin="1,0,0,0" />
+                <TextBlock Grid.Column="1" Name="lblDirection" Text="Translating..." Padding="3,2,2,0"
+                           TextTrimming="WordEllipsis" FontWeight="Bold" />
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Name="cmdSettings" VerticalAlignment="Center"
+                            Click="cmdSettings_Click" ToolTip="Settings">
+                        <Path
+                            Data="M860.115,417.777C856.507,419.008 854.822,414.544 857.016,412.44 855.582,410.967 854.599,410.495 852.713,410.202 852.434,411.376 851.772,412.381 850.646,412.612 848.58,413.035 847.333,411.535 846.686,410.03 843.596,411.048 842.383,412.784 842.383,412.784 842.383,412.784 843.009,413.367 843.07,413.472 844.382,415.751 842.474,418.591 839.284,417.777 839.039,419.387 839.039,421.504 839.284,423.113 842.763,421.818 844.714,426.328 842.383,428.278 843.779,429.751 844.586,430.276 846.858,430.689 847.248,427.475 852.488,427.46 852.884,430.689 855.38,430.195 857.016,428.107 857.016,428.107 857.016,428.107 856.083,427.138 855.983,426.557 855.517,423.831 857.501,422.762 860.115,423.113 860.567,421.492 860.511,419.419 860.115,417.777z M849.766,424.579C847.436,424.579 845.546,422.69 845.546,420.359 845.546,418.028 847.436,416.139 849.766,416.139 852.098,416.139 853.987,418.028 853.987,420.359 853.987,422.69 852.098,424.579 849.766,424.579z"
+                            Stretch="Uniform" Width="11" Height="11" />
+                    </Button>
+                    <Button Name="cmdClose" VerticalAlignment="Center"
+                            Click="cmdClose_Click" ToolTip="Close">
+                        <Path
+                            Data="F1M54.0573,47.8776L38.1771,31.9974 54.0547,16.1198C55.7604,14.4141 55.7604,11.6511 54.0573,9.94531 52.3516,8.23962 49.5859,8.23962 47.8802,9.94531L32.0026,25.8229 16.1224,9.94531C14.4167,8.23962 11.6511,8.23962 9.94794,9.94531 8.24219,11.6511 8.24219,14.4141 9.94794,16.1198L25.8255,32 9.94794,47.8776C8.24219,49.5834 8.24219,52.3477 9.94794,54.0534 11.6511,55.7572 14.4167,55.7585 16.1224,54.0534L32.0026,38.1745 47.8802,54.0534C49.5859,55.7585 52.3516,55.7572 54.0573,54.0534 55.7604,52.3477 55.763,49.5834 54.0573,47.8776z"
+                            Stretch="Uniform" Width="10" Height="10" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <!--error-->
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="lblError" Visibility="Collapsed" Padding="3,5" 
+                           Foreground="Firebrick" TextTrimming="None" TextWrapping="Wrap"/>
+            </Grid>
+            
+            <!--results-->
+            <ListBox x:Name="spListBox" Grid.Row="2" IsSynchronizedWithCurrentItem="True"
+                     BorderThickness="0" HorizontalContentAlignment="Stretch"
+                     Background="Transparent" MaxHeight="600" VerticalAlignment="Top"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     SelectionMode="Single" Margin="-1,0,-1,-1" ItemContainerStyle="{DynamicResource TranslationListBoxItemStyle}">
+                <ListBox.GroupStyle>
+                    <GroupStyle HidesIfEmpty="True">
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Border Padding="6,3,3,3"
+                                        Background="{DynamicResource {x:Static shell:VsBrushes.TitleBarActiveGradientBeginKey}}"
+                                        Visibility="{Binding Name, Converter={StaticResource StringEmptyToVisibilityConverter}}">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Name}"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource {x:Static shell:VsBrushes.TitleBarActiveTextKey}}" />
+                                </Border>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <StackPanel>
+                                                <ContentPresenter />
+                                                <ItemsPresenter />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <adornment:TranslationItemControl DataContext="{Binding}"
+                                                          Command="{Binding ItemCommand,ElementName=TranslationAdornmentControl, Mode=OneWay}"
+                                                          OptionsCommand="{Binding ItemOptionsCommand,ElementName=TranslationAdornmentControl, Mode=OneWay}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu x:Name="ItemsMenu">
+                        <MenuItem Header="Copy" Tag="copy" InputGestureText="Ctrl+C"
+                                  Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <MenuItem Header="Edit" Tag="edit"
+                                  Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <Separator/>
+                        <MenuItem Header="Copy All" Tag="copyall"
+                                  Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+
+            <StackPanel HorizontalAlignment="Left" Height="100" Margin="47,17,0,-116" 
+                        Grid.Row="1"  Grid.RowSpan="2"
+                        VerticalAlignment="Top" Width="100" />
+        </Grid>
+    </Border>
+</UserControl>
