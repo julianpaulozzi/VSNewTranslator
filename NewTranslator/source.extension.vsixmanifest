@@ -3,7 +3,9 @@
   <Metadata>
     <Identity Id="501161f5-2f94-4838-bf49-0b0b861418f3" Version="1.0" Language="en-US" Publisher="Julian Paulozzi" />
     <DisplayName>New Translator</DisplayName>
-    <Description xml:space="preserve">Translates selected text in code editor. This extension is based on the Translator project: http://vstranslator.codeplex.com</Description>
+    <Description xml:space="preserve">Easy way to translates selected text in code editor. 
+This extension is based on the Translator project: http://vstranslator.codeplex.com</Description>
+    <Icon>Resources\NewTranslatorPackage.png</Icon>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,15.0)" />
