@@ -24,7 +24,6 @@
   <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
   <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
 
-
   <!--The Commands section is where we the commands, menus and menu groups are defined.
 	  This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidTranslatorExtensionPackagePkg">
@@ -60,14 +59,21 @@
 
       <Button guid="TranslatorCmdSetGuid" id="cmdIDTranslate" priority="0x0100" type="Button">
         <Parent guid="TranslatorCmdSetGuid" id="MyMenuGroup" />
+        <Icon guid="TranslatorMenuIcon" id="DefaultTranslatorMenuIcon" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
         <Strings>
           <CommandName>cmdIDTranslate</CommandName>
           <ButtonText>Translate</ButtonText>
         </Strings>
       </Button>
     </Buttons>
-  </Commands>
 
+    <Bitmaps>
+      <Bitmap guid="TranslatorMenuIcon" href="Resources\MenuIcon.png" usedList="DefaultTranslatorMenuIcon"/>
+    </Bitmaps>
+    
+  </Commands>
   <CommandPlacements>
     <CommandPlacement guid="TranslatorCmdSetGuid" id="MyMenuGroup" priority="0x0600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
@@ -130,6 +136,10 @@
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidTranslatorExtensionPackagePkg" value="{CD0A6324-7C6F-422A-B4C3-1F0879189727}" />
+
+    <GuidSymbol name="TranslatorMenuIcon" value="{430AB46E-5CFA-4263-B49A-606881B60222}">
+      <IDSymbol name="DefaultTranslatorMenuIcon" value="1" />
+    </GuidSymbol>
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="TranslatorCmdSetGuid" value="{d783f40e-5bb3-4a56-b485-c435acaf40f9}">

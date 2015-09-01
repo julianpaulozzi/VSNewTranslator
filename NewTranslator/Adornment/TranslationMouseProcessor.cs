@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Text.Editor;
@@ -6,15 +7,18 @@ namespace NewTranslator.Adornment
 {
     internal sealed class TranslationMouseProcessor : IMouseProcessor
     {
-
-        private IWpfTextView _view;
-        private TranslationAdornmentManager _translationAdornmentManager;
-        private bool _rightButtonHandled;
-
+        private readonly TranslationAdornmentManager _translationAdornmentManager;
+        
         public TranslationMouseProcessor(IWpfTextView view)
         {
-            _view = view;
-            _translationAdornmentManager = _view.Properties.GetProperty<TranslationAdornmentManager>(typeof(TranslationAdornmentManager));
+            try
+            {
+                _translationAdornmentManager = view.Properties.GetProperty<TranslationAdornmentManager>(typeof(TranslationAdornmentManager));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void PostprocessMouseLeftButtonUp(MouseButtonEventArgs e)

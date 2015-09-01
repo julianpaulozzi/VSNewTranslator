@@ -1,4 +1,7 @@
-﻿namespace NewTranslator
+﻿using System;
+using System.Text.RegularExpressions;
+
+namespace NewTranslator
 {
     internal static class StringExtensions
     {
@@ -29,6 +32,20 @@
             }
 
             return trimmedText;
+        }
+
+        public static string Truncate(this string value, int maxChars, string postfix = "...")
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+            var result = value.Length <= maxChars ? value : value.Substring(0, maxChars) + postfix;
+            result = result.Replace(Environment.NewLine, "");
+            return result;
+        }
+
+        internal static string ToSingleWordsSpace(this string text)
+        {
+            return Regex.Replace(text, @"\s+", " ");
         }
     }
 }

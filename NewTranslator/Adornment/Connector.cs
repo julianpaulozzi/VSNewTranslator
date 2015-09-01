@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using NewTranslator.Core.Translation;
@@ -17,10 +18,25 @@ namespace NewTranslator.Adornment
         }
 
         public static void Execute(IWpfTextView view, TranslationRequest request)
-        {	
-			var manager = view.Properties.GetProperty<TranslationAdornmentManager>(typeof(TranslationAdornmentManager));
+        {
+            TranslationAdornmentManager manager = null;
+            try
+            {
+                manager = view.Properties.GetProperty<TranslationAdornmentManager>(typeof(TranslationAdornmentManager));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            if (manager == null)
+            {
+                manager = TranslationAdornmentManager.Create(view);
+            }
+            if (manager == null) return;
+
             manager.AddTranslation(view.Selection.SelectedSpans[0], request);
-			request.GetTranslationAsync();
+            request.GetTranslationAsync();
         }
 
         [Export(typeof(AdornmentLayerDefinition))]

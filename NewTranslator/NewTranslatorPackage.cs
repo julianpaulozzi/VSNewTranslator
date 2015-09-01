@@ -2,7 +2,6 @@
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -23,17 +22,22 @@ namespace NewTranslator
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.TranslatorPackageGuid)]
-    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
-    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+    // [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+    [ProvideAutoLoad(UIContextGuids80.CodeWindow)]
+    [ProvideAutoLoad("f1536ef8-92ec-443c-9ed7-fdadf150da82")]
+    // [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     public sealed class NewTranslatorPackage : Microsoft.VisualStudio.Shell.Package
     {
+        private IVsStatusbar _vsStatusbar;
+
         /// <summary>
         /// This read-only property returns the package instance
         /// </summary>
         internal static NewTranslatorPackage Instance { get; private set; }
 
-        public NewTranslatorPackage()
+        private IVsStatusbar StatusBar
         {
+            get { return _vsStatusbar ?? (_vsStatusbar = GetService(typeof (SVsStatusbar)) as IVsStatusbar); }
         }
 
         protected override void Initialize()
@@ -43,13 +47,34 @@ namespace NewTranslator
             Instance = this;
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
                 // Create the command for the menu item.
-                CommandID translateCommandID = new CommandID(GuidList.guidTranslatorCmdSet, (int)PkgCmdIDList.Translate);
-                MenuCommand menuItemTranslate = new MenuCommand(TranslateMenu_Clicked, translateCommandID);
+                var translateCommandId = new CommandID(GuidList.guidTranslatorCmdSet, (int)PkgCmdIDList.Translate);
+                var menuItemTranslate = new OleMenuCommand(TranslateMenu_Clicked, translateCommandId);
+                menuItemTranslate.BeforeQueryStatus += MenuItemTranslateOnBeforeQueryStatus;
                 mcs.AddCommand(menuItemTranslate);
+            }
+        }
+
+        private void MenuItemTranslateOnBeforeQueryStatus(object sender, EventArgs eventArgs)
+        {
+            var oleMenuCommand = sender as OleMenuCommand;
+            if (oleMenuCommand != null)
+            {
+                var view = GetActiveTextView();
+                oleMenuCommand.Enabled = view != null && view.Selection != null && !view.Selection.IsEmpty;
+                if (oleMenuCommand.Enabled)
+                {
+                    var span = view.Selection.SelectedSpans[0];
+                    var selectedText = span.GetText();
+                    oleMenuCommand.Text = string.Format("Translate '{0}'", selectedText.Truncate(26));
+                }
+                else
+                {
+                    oleMenuCommand.Text = "Translate";
+                }
             }
         }
 
@@ -67,17 +92,14 @@ namespace NewTranslator
             IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
             txtMgr.GetActiveView(1, null, out vTextView);
 
-            IVsUserData userData = vTextView as IVsUserData;
-            if (null != userData)
-            {
-                IWpfTextViewHost viewHost;
-                object holder;
-                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-                userData.GetData(ref guidViewHost, out holder);
-                viewHost = (IWpfTextViewHost)holder;
-                return viewHost.TextView;
-            }
-            return null;
+            var userData = vTextView as IVsUserData;
+            if (null == userData) return null;
+
+            object holder;
+            var guidViewHost = DefGuidList.guidIWpfTextViewHost;
+            userData.GetData(ref guidViewHost, out holder);
+            var viewHost = (IWpfTextViewHost)holder;
+            return viewHost.TextView;
         }
 
         /// <summary>
@@ -87,12 +109,13 @@ namespace NewTranslator
         /// </summary>
         private void TranslateMenu_Clicked(object sender, EventArgs e)
         {
+            ClearStatusBar();
             IWpfTextView view = GetActiveTextView();
             ITextSelection selection = view.Selection;
-            if (selection != null)
+            if (selection != null && !selection.IsEmpty)
             {
                 SnapshotSpan span = view.Selection.SelectedSpans[0];
-                String selectedText = span.GetText();
+                var selectedText = span.GetText();
                 //nothing is selected - taking the entire line
                 if (string.IsNullOrEmpty(selectedText))
                 {
@@ -103,8 +126,7 @@ namespace NewTranslator
                 //still no selection
                 if (string.IsNullOrWhiteSpace(selectedText))
                 {
-                    MessageBox.Show("Nothing to translate", "Translator", MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
+                    NotifyNothingToTranslate();
                 }
                 else
                 {
@@ -126,8 +148,29 @@ namespace NewTranslator
 
                     var request = new TranslationRequest(selectedText, opt.SourceLanguage, opt.TargetLanguage,
                         opt.Translators.ToArray());
+
                     Connector.Execute(view, request);
                 }
+            }
+            else
+            {
+                NotifyNothingToTranslate();
+            }
+        }
+
+        private void ClearStatusBar()
+        {
+            StatusBar.FreezeOutput(0);
+            StatusBar.Clear();
+        }
+
+        private void NotifyNothingToTranslate()
+        {
+            int frozen;
+            StatusBar.IsFrozen(out frozen);
+            if (frozen == 0)
+            {
+                StatusBar.SetText("Nothing to translate.");
             }
         }
     }
