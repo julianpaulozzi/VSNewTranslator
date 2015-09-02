@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -77,10 +78,13 @@ namespace NewTranslator.Adornment
 
             if(_translationAdornmentFocused != null && _translationAdornmentFocused.MenuIsOpen)
                 return true;
-            
+
+            // Debug.WriteLine(">> VSStd2KCmdID: {0}", key);
+
             switch (key)
             {
                 case VSConstants.VSStd2KCmdID.RETURN:
+                case VSConstants.VSStd2KCmdID.TYPECHAR:
                     if (_translationAdornmentFocused != null)
                         _translationAdornmentFocused.TryReplaceWithCurrentItem();
                     return true;
@@ -110,7 +114,6 @@ namespace NewTranslator.Adornment
                     return true;
                 case VSConstants.VSStd2KCmdID.INSERT:
                 case VSConstants.VSStd2KCmdID.DELETE:
-                case VSConstants.VSStd2KCmdID.TYPECHAR:
                 case VSConstants.VSStd2KCmdID.BACKSPACE:
                 case VSConstants.VSStd2KCmdID.TAB:
                 case VSConstants.VSStd2KCmdID.END:
@@ -135,9 +138,12 @@ namespace NewTranslator.Adornment
 
             if (_translationAdornmentFocused != null && _translationAdornmentFocused.MenuIsOpen)
                 return true;
-            
+
+            // Debug.WriteLine(">> VSStd2KCmdID: {0}", key);
+
             switch (key)
             {
+                //case VSConstants.VSStd97CmdID.SpaceOrTab:
                 case VSConstants.VSStd97CmdID.Copy:
                     if (_translationAdornmentFocused != null)
                         _translationAdornmentFocused.CopyCurrentItemText();

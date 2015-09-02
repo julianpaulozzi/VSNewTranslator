@@ -66,10 +66,15 @@ namespace NewTranslator.Adornment
             if (translationItem == null)
                 return;
 
+            var textWithOverflow = translationItem.TextWithOverflow;
             switch (tag.ToLower())
             {
+                case "replace":
+                    if(!string.IsNullOrEmpty(textWithOverflow))
+                        ReplaceSnapshotSpanText(textWithOverflow);
+                    break;
                 case "copy":
-                    Clipboard.SetText(translationItem.TextWithOverflow);
+                    Clipboard.SetText(textWithOverflow);
                     break;
                 case "edit":
                     Visibility = Visibility.Hidden;

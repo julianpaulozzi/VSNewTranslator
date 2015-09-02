@@ -114,6 +114,9 @@
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu x:Name="ItemsMenu">
+                        <MenuItem Header="Replace" Tag="replace" InputGestureText="Ctrl+C"
+                                  Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
                         <MenuItem Header="Copy" Tag="copy" InputGestureText="Ctrl+C"
                                   Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>

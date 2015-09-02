@@ -82,8 +82,9 @@ namespace NewTranslator.Core.Translation.Bing
 
         public virtual Task<string> GetTranslationsAsync(string text, string sourceLang, string destLang)
         {
+            var cleanText = text.Trim();
             return GetDataAsync("GetTranslations", new Dictionary<string, string> {                
-                {"text", text},
+                {"text", cleanText},
 				{"from", sourceLang},
 				{"to", destLang},
 				{"maxTranslations", "20"}

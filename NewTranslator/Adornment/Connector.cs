@@ -28,11 +28,6 @@ namespace NewTranslator.Adornment
             {
                 Console.WriteLine(e);
             }
-
-            if (manager == null)
-            {
-                manager = TranslationAdornmentManager.Create(view);
-            }
             if (manager == null) return;
 
             manager.AddTranslation(view.Selection.SelectedSpans[0], request);

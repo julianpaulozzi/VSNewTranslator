@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace NewTranslator
 {
@@ -46,6 +48,15 @@ namespace NewTranslator
         internal static string ToSingleWordsSpace(this string text)
         {
             return Regex.Replace(text, @"\s+", " ");
+        }
+    }
+
+    internal static class VsShellExtensions
+    {
+        internal static bool IsPackageInstalled(this IVsShell vsShell, Guid packageId)
+        {
+            int isInstalled;
+            return ErrorHandler.Succeeded(vsShell.IsPackageInstalled(ref packageId, out isInstalled)) && 1 == isInstalled;
         }
     }
 }

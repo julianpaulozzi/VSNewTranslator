@@ -3,6 +3,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Editor;
+using NewTranslator.Services;
 
 namespace NewTranslator.Adornment
 {
@@ -12,14 +13,14 @@ namespace NewTranslator.Adornment
         private readonly IWpfTextView m_textView;
         internal bool m_added;
         internal IOleCommandTarget m_nextTarget;
-
+        
         public TranslationCommandFilter(IWpfTextView tv)
         {
             m_textView = tv;
             _translationAdornmentManager =
                 m_textView.Properties.GetProperty<TranslationAdornmentManager>(typeof (TranslationAdornmentManager));
         }
-
+        
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             if (_translationAdornmentManager != null && _translationAdornmentManager.m_adorned)
@@ -49,6 +50,23 @@ namespace NewTranslator.Adornment
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
+            if (_translationAdornmentManager != null && _translationAdornmentManager.m_adorned)
+            {
+                if (pguidCmdGroup == typeof (VSConstants.VSStd2KCmdID).GUID)
+                {
+                    for (int i = 0; i < cCmds; i++)
+                    {
+                        switch (prgCmds[i].cmdID)
+                        {
+                            case ((uint)VSConstants.VSStd2KCmdID.RETURN):
+                            case ((uint)VSConstants.VSStd2KCmdID.TYPECHAR):
+                            case ((uint)VSConstants.VSStd2KCmdID.CANCEL):
+                                prgCmds[i].cmdf = VSConstants.S_OK;
+                                break;
+                        }
+                    }
+                }
+            }
                 /*if (pguidCmdGroup == typeof(VSConstants.VSStd2KCmdID).GUID)
                 {
                     for (int i = 0; i < cCmds; i++)
