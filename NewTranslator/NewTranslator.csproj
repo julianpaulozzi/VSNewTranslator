@@ -74,6 +74,7 @@
     <Compile Include="Guids.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Presentation\DataContextProxy.cs" />
+    <Compile Include="Presentation\EditedTranslationItemToBooleanConverter.cs" />
     <Compile Include="Presentation\ExDialogWindow.cs" />
     <Compile Include="Presentation\ModernProgressRing.cs" />
     <Compile Include="Presentation\RelayCommand.cs" />

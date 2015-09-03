@@ -102,6 +102,7 @@ namespace NewTranslator.Core.Translation.Bing
 		    JObject json = JObject.Parse(translations);
             var result = ParseResponse(json);
             result.DestinationLanguage = destinationLang;
+	        result.RequestSourceLanguage = sourceLang;
             result.OriginalText = text;
             result.TranslationSource = Name;
             

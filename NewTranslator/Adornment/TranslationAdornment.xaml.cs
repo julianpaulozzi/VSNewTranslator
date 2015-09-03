@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,7 @@ namespace NewTranslator.Adornment
         private readonly ContextMenu _menu;
         private bool _closeMenuRequested;
         private bool _ignoreItemCommand;
+        private ObservableCollection<TranslationItem> _resultsCollection;
 
         public TranslationAdornment(SnapshotSpan span, TranslationRequest request, Size viewportSize)
         {
@@ -79,7 +81,16 @@ namespace NewTranslator.Adornment
                 case "edit":
                     Visibility = Visibility.Hidden;
                     var editTranslationDialog = new EditTranslationDialog(translationItem,
-                        item => { if (item != null) ReplaceSnapshotSpanText(item.Text); }, this);
+                        item =>
+                        {
+                            if (item != null)
+                            {
+                                ReplaceSnapshotSpanText(item.Text);
+                                TranslationCache.AddUserEditedItem(item.TranslationSource, item.RequestSourceLanguage, 
+                                    item.DestinationLanguage, item.OriginalText, item.Text);
+                            }
+
+                        }, this);
                     editTranslationDialog.ShowModal();
                     Visibility = Visibility.Visible;
                     break;
@@ -87,6 +98,15 @@ namespace NewTranslator.Adornment
                     var s1 = spListBox.Items.Cast<object>()
                         .Aggregate("", (current, item) => current + (item + Environment.NewLine));
                     Clipboard.SetText(s1);
+                    break;
+                case "removeedit":
+                    var removed = TranslationCache.RemoveUserEditedItem(translationItem.TranslationSource, translationItem.RequestSourceLanguage,
+                                    translationItem.DestinationLanguage, translationItem.OriginalText, translationItem.Text);
+                    if (removed)
+                    {
+                        _resultsCollection.Remove(translationItem);
+                        MoveCurrentItem(true);
+                    }
                     break;
             }
         }
@@ -161,37 +181,45 @@ namespace NewTranslator.Adornment
 
         private void RenderTranslation(IEnumerable<TranslationResult> translationResults)
         {
-            var result = new List<TranslationItem>();
+            var results = new List<TranslationItem>();
             foreach (var translationResult in translationResults)
             {
                 var originalText = translationResult.OriginalText;
                 var translationSource = translationResult.TranslationSource;
-                lblDirection.Text = string.Format("{0} - {1}", translationResult.SourceLanguage.ToUpper(), translationResult.DestinationLanguage.ToUpper());
+                var sourceLanguage = translationResult.SourceLanguage;
+                var destinationLanguage = translationResult.DestinationLanguage;
+                var requestSourceLanguage = translationResult.RequestSourceLanguage;
+                lblDirection.Text = string.Format("{0} - {1}", sourceLanguage.ToUpper(), destinationLanguage.ToUpper());
                 if (translationResult.Sentences != null)
                 {
-                    result.AddRange(translationResult.Sentences
+                    results.AddRange(translationResult.Sentences
                         .Select(s => new TranslationItem
                         {
                             Text = s,
                             OriginalText = originalText,
-                            TranslationSource = translationSource
+                            TranslationSource = translationSource,
+                            RequestSourceLanguage = requestSourceLanguage,
+                            DestinationLanguage = destinationLanguage
                         }));
                 }
 
                 foreach (var di in translationResult.DictionaryItems)
                 {
-                    result.AddRange(di.Terms
+                    results.AddRange(di.Terms
                         .Select(term => new TranslationItem
                         {
                             Header = di.Title,
                             Text = term,
                             OriginalText = originalText,
-                            TranslationSource = translationSource
+                            TranslationSource = translationSource,
+                            RequestSourceLanguage = requestSourceLanguage,
+                            DestinationLanguage = destinationLanguage
                         }));
                 }
             }
-            
-            var view = CollectionViewSource.GetDefaultView(result);
+
+            _resultsCollection = new ObservableCollection<TranslationItem>(results);
+            var view = CollectionViewSource.GetDefaultView(_resultsCollection);
             view.GroupDescriptions.Add(new PropertyGroupDescription("Header"));
             spListBox.ItemsSource = view;
         }

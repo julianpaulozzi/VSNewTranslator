@@ -70,11 +70,7 @@ namespace NewTranslator.Adornment
 
             ReplaceButton.Click += (sender, args) =>
             {
-                var item = new TranslationItem
-                {
-                    Header = translationItem.Header,
-                    Text = TranslationTextBox.Text
-                };
+                var item = new TranslationItem(translationItem) {Text = TranslationTextBox.Text};
                 DialogResult = true;
                 callback(item);
                 Close();

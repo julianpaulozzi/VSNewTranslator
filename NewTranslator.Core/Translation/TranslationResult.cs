@@ -18,6 +18,7 @@ namespace NewTranslator.Core.Translation
         public string DestinationLanguage { get; set; }
 
         public string OriginalText { get; protected internal set; }
+        public string RequestSourceLanguage { get; protected internal set; }
         public string TranslationSource { get; protected internal set; }
         public DateTime CreatedAt { get; protected set; }
         public bool FromCache { get; protected internal set; }

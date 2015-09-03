@@ -143,7 +143,6 @@ namespace NewTranslator.Adornment
 
             switch (key)
             {
-                //case VSConstants.VSStd97CmdID.SpaceOrTab:
                 case VSConstants.VSStd97CmdID.Copy:
                     if (_translationAdornmentFocused != null)
                         _translationAdornmentFocused.CopyCurrentItemText();

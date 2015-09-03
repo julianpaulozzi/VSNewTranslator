@@ -15,6 +15,11 @@ namespace NewTranslator.Core
             public const string Google = "Google";
         }
 
+        internal static class TranslationCache
+        {
+            public const string UserEditedItemHeader = "Edited";
+        }
+
         internal class GoogleTranslator
         {
             internal const string BaseUrl = "http://translate.google.com/translate_a/t";

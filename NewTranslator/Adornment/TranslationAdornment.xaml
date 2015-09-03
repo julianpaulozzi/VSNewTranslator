@@ -23,6 +23,7 @@
             </ResourceDictionary.MergedDictionaries>
             <presentation:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter" />
             <presentation:DataContextProxy x:Key="DataContextProxy" Data="{Binding}"/>
+            <presentation:EditedTranslationItemToVisibilityConverter x:Key="EditedTranslationItemToVisibilityConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -114,13 +115,17 @@
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu x:Name="ItemsMenu">
-                        <MenuItem Header="Replace" Tag="replace" InputGestureText="Ctrl+C"
+                        <MenuItem Header="Replace" Tag="replace" InputGestureText="Space"
                                   Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
                         <MenuItem Header="Copy" Tag="copy" InputGestureText="Ctrl+C"
                                   Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
                         <MenuItem Header="Edit" Tag="edit"
+                                  Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <MenuItem Header="Remove edition" Tag="removeedit"
+                                  Visibility="{Binding Converter={StaticResource EditedTranslationItemToVisibilityConverter}}"
                                   Command="{Binding Data.MenuCommand, Source={StaticResource DataContextProxy}}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
                         <Separator/>

@@ -82,6 +82,7 @@ namespace NewTranslator.Core.Translation
             JObject json = JObject.Parse(response);
             var result = ParseResponse(json);
             result.DestinationLanguage = destinationLang;
+            result.RequestSourceLanguage = sourceLang;
             result.OriginalText = text;
             result.TranslationSource = Name;
             
