@@ -64,7 +64,7 @@
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
           <CommandName>cmdIDTranslate</CommandName>
-          <ButtonText>Translate</ButtonText>
+          <ButtonText>TranslateSelection</ButtonText>
         </Strings>
       </Button>
     </Buttons>

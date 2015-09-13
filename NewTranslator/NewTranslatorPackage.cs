@@ -73,7 +73,7 @@ namespace NewTranslator
                 }
                 else
                 {
-                    oleMenuCommand.Text = "Translate";
+                    oleMenuCommand.Text = "Translate Selection";
                 }
             }
         }

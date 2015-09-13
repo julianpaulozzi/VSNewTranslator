@@ -172,6 +172,10 @@
     <Resource Include="Images\google_translate_12x12.png" />
     <Resource Include="Images\google_translate_16x16.png" />
     <Resource Include="Images\settings.png" />
+    <Content Include="Resources\img_full_context.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\MenuIcon.png" />
     <Content Include="Resources\NewTranslatorPackage.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
